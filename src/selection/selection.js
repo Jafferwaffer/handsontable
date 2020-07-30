@@ -520,7 +520,7 @@ class Selection {
    * @param {Number|String} [endColumn] Visual column index or column property from to the selection finishes.
    * @returns {Boolean} Returns `true` if selection was successful, `false` otherwise.
    */
-  selectColumns(startColumn, endColumn = startColumn) {
+  selectColumns(startColumn, endColumn = startColumn, mouseEvent = false) {
     const start = typeof startColumn === 'string' ? this.tableProps.propToCol(startColumn) : startColumn;
     const end = typeof endColumn === 'string' ? this.tableProps.propToCol(endColumn) : endColumn;
 
@@ -530,7 +530,10 @@ class Selection {
     if (isValid) {
       this.setRangeStartOnly(new CellCoords(-1, start));
       this.setRangeEnd(new CellCoords(this.tableProps.countRows() - 1, end));
-      this.finish();
+
+      if (!mouseEvent) {
+        this.finish();
+      }
     }
 
     return isValid;
@@ -543,14 +546,17 @@ class Selection {
    * @param {Number} [endRow] Visual row index from to the selection finishes.
    * @returns {Boolean} Returns `true` if selection was successful, `false` otherwise.
    */
-  selectRows(startRow, endRow = startRow) {
+  selectRows(startRow, endRow = startRow, mouseEvent = false) {
     const countRows = this.tableProps.countRows();
     const isValid = isValidCoord(startRow, countRows) && isValidCoord(endRow, countRows);
 
     if (isValid) {
       this.setRangeStartOnly(new CellCoords(startRow, -1));
       this.setRangeEnd(new CellCoords(endRow, this.tableProps.countCols() - 1));
-      this.finish();
+
+      if (!mouseEvent) {
+        this.finish();
+      }
     }
 
     return isValid;
