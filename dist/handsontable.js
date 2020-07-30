@@ -29,7 +29,7 @@
  * FROM USE OR INABILITY TO USE THIS SOFTWARE.
  * 
  * Version: 7.4.2
- * Release date: 19/02/2020 (built at 19/02/2020 13:44:06)
+ * Release date: 19/02/2020 (built at 30/07/2020 15:33:49)
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -33009,9 +33009,9 @@ function mouseDown(_ref) {
     } else if (selectedRow && coords.col < 0 && !controller.row) {
       selection.setRangeEnd(new _src.CellCoords(coords.row, currentSelection.to.col));
     } else if ((!selectedCorner && !selectedRow && coords.col < 0 || selectedCorner && coords.col < 0) && !controller.row) {
-      selection.selectRows(currentSelection.from.row, coords.row);
+      selection.selectRows(currentSelection.from.row, coords.row, true);
     } else if ((!selectedCorner && !selectedRow && coords.row < 0 || selectedRow && coords.row < 0) && !controller.column) {
-      selection.selectColumns(currentSelection.from.col, coords.col);
+      selection.selectColumns(currentSelection.from.col, coords.col, true);
     }
   } else {
     var newCoord = new _src.CellCoords(coords.row, coords.col);
@@ -33029,12 +33029,12 @@ function mouseDown(_ref) {
 
     if (coords.row < 0 && coords.col >= 0 && !controller.column) {
       if (performSelection) {
-        selection.selectColumns(coords.col);
+        selection.selectColumns(coords.col, coords.col, true);
       } // clicked column header and when some row was selected
 
     } else if (coords.col < 0 && coords.row >= 0 && !controller.row) {
       if (performSelection) {
-        selection.selectRows(coords.row);
+        selection.selectRows(coords.row, coords.row, true);
       }
     } else if (coords.col >= 0 && coords.row >= 0 && !controller.cells) {
       if (performSelection) {
@@ -40167,7 +40167,7 @@ Handsontable.EventManager = _eventManager.default;
 Handsontable._getListenersCounter = _eventManager.getListenersCounter; // For MemoryLeak tests
 
 Handsontable.packageName = 'handsontable';
-Handsontable.buildDate = "19/02/2020 13:44:06";
+Handsontable.buildDate = "30/07/2020 15:33:49";
 Handsontable.version = "7.4.2"; // Export Hooks singleton
 
 Handsontable.hooks = _pluginHooks.default.getSingleton(); // TODO: Remove this exports after rewrite tests about this module
@@ -51476,6 +51476,7 @@ function () {
     key: "selectColumns",
     value: function selectColumns(startColumn) {
       var endColumn = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : startColumn;
+      var mouseEvent = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
       var start = typeof startColumn === 'string' ? this.tableProps.propToCol(startColumn) : startColumn;
       var end = typeof endColumn === 'string' ? this.tableProps.propToCol(endColumn) : endColumn;
       var countCols = this.tableProps.countCols();
@@ -51484,7 +51485,10 @@ function () {
       if (isValid) {
         this.setRangeStartOnly(new _src.CellCoords(-1, start));
         this.setRangeEnd(new _src.CellCoords(this.tableProps.countRows() - 1, end));
-        this.finish();
+
+        if (!mouseEvent) {
+          this.finish();
+        }
       }
 
       return isValid;
@@ -51501,13 +51505,17 @@ function () {
     key: "selectRows",
     value: function selectRows(startRow) {
       var endRow = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : startRow;
+      var mouseEvent = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
       var countRows = this.tableProps.countRows();
       var isValid = (0, _utils.isValidCoord)(startRow, countRows) && (0, _utils.isValidCoord)(endRow, countRows);
 
       if (isValid) {
         this.setRangeStartOnly(new _src.CellCoords(startRow, -1));
         this.setRangeEnd(new _src.CellCoords(endRow, this.tableProps.countCols() - 1));
-        this.finish();
+
+        if (!mouseEvent) {
+          this.finish();
+        }
       }
 
       return isValid;
